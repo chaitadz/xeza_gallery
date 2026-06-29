@@ -1,4 +1,4 @@
-# bloc_project
+# xeza_gallery
 
 A new Flutter project.
 

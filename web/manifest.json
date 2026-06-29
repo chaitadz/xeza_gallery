@@ -1,6 +1,6 @@
 {
-    "name": "bloc_project",
-    "short_name": "bloc_project",
+    "name": "xeza_gallery",
+    "short_name": "xeza_gallery",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

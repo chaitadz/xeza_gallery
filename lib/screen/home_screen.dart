@@ -11,27 +11,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   void checkPlatform() {
     if (Theme.of(context).platform == TargetPlatform.android) {
-      print('Running on Android');
+      debugPrint('Running on Android');
     } else if (Theme.of(context).platform == TargetPlatform.iOS) {
-      print('Running on iOS');
+      debugPrint('Running on iOS');
     } else {
-      print('Running on an unknown platform');
+      debugPrint('Running on an unknown platform');
     }
 
     if (!kIsWeb) {
-    String osName = Platform.operatingSystem;
-    print("OS Name: $osName");
-  }
+      String osName = Platform.operatingSystem;
+      debugPrint("OS Name: $osName");
+    }
   }
 
   @override
@@ -44,33 +36,36 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            // const Text('You have pushed the button this many times:'),
+            // Text(
+            //   '$_counter',
+            //   style: Theme.of(context).textTheme.headlineMedium,
+            // ),
+            Row(children: []),
+            Text('text 1'),
+            Row(
+              children: [
+                Text('text 2'),
+                SizedBox(width: 100),
+                Text('text 3'),
+                Container(
+                  width: 100,
+                  height: 100,
+                  color: Colors.red,
+                  child: Center(child: Text('text 4')),
+                ),
+              ],
             ),
-          Text('text 1'),
-          Row(children: [
-            Text('text 2'),
-            SizedBox(width: 100,),
-            Text('text 3'),
-            Container(
-              width: 100,
-              height: 100,
-              color: Colors.red,
-              child: Center(child: Text('text 4'),),
-            )
-          ],)
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: _incrementCounter,
+      //   tooltip: 'Increment',
+      //   child: const Icon(Icons.add),
+      // ),
     );
   }
 }

@@ -1,4 +1,4 @@
-import 'package:bloc_project/screen/home_screen.dart';
+import 'package:xeza_gallery/screen/home_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
