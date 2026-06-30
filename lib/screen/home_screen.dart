@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../xeza_bloc.dart';
-import '../xeza_model.dart';
+import '../nasa_bloc.dart';
+import '../nasa_model.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -32,22 +32,22 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title, style: const TextStyle(fontWeight: FontWeight.bold)),
       ),
-      body: BlocBuilder<XezaBloc, XezaState>(
+      body: BlocBuilder<NasaBloc, NasaState>(
         builder: (context, state) {
-          if (state is XezaLoading) {
+          if (state is NasaLoading) {
             return const Center(child: CircularProgressIndicator());
           }
           
-          if (state is XezaError) {
+          if (state is NasaError) {
             return Center(child: Text(state.message));
           }
 
-          if (state is XezaLoaded) {
-            final xezaList = state.items;
+          if (state is NasaLoaded) {
+            final nasaList = state.items;
             return Padding(
               padding: const EdgeInsets.all(12.0),
               child: GridView.builder(
-                itemCount: xezaList.length,
+                itemCount: nasaList.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: crossAxisCount,
                   crossAxisSpacing: 12,
@@ -55,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   childAspectRatio: 0.7,
                 ),
                 itemBuilder: (context, index) {
-                  final item = xezaList[index];
+                  final item = nasaList[index];
                   return GestureDetector(
                     onTap: () {
                       Navigator.push(
@@ -114,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class DetailScreen extends StatelessWidget {
-  final XezaItem item;
+  final NasaItem item;
   const DetailScreen({super.key, required this.item});
 
   @override
@@ -150,7 +150,7 @@ class DetailScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                   Wrap(
                     spacing: 8,
-                    runSpacing: 8,
+                    runSpacing: 0,
                     children: item.keywords.map((keyword) {
                       return Chip(label: Text('#$keyword'), labelStyle: const TextStyle(fontSize: 12));
                     }).toList(),

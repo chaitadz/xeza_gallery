@@ -1,4 +1,4 @@
-class XezaItem {
+class NasaItem {
   final String title;
   final String center;
   final String dateCreated;
@@ -6,7 +6,7 @@ class XezaItem {
   final String imageUrl;
   final List<String> keywords;
 
-  XezaItem({
+  NasaItem({
     required this.title,
     required this.center,
     required this.dateCreated,
@@ -15,7 +15,7 @@ class XezaItem {
     required this.keywords,
   });
 
-  factory XezaItem.fromJson(Map<String, dynamic> json) {
+  factory NasaItem.fromJson(Map<String, dynamic> json) {
     final dataList = json['data'] as List<dynamic>?;
     final linksList = json['links'] as List<dynamic>?;
     final data = dataList != null && dataList.isNotEmpty ? dataList[0] : {};
@@ -31,7 +31,7 @@ class XezaItem {
       }
     }
 
-    return XezaItem(
+    return NasaItem(
       title: data['title'] ?? 'No Title',
       center: data['center'] ?? 'NASA',
       dateCreated: data['date_created'] ?? '',

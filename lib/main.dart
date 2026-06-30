@@ -1,7 +1,7 @@
 import 'package:xeza_gallery/screen/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'xeza_bloc.dart';
+import 'nasa_bloc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Xeza BLoC Demo',
+      title: 'Nasa BLoC Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -23,8 +23,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: BlocProvider(
-        create: (context) => XezaBloc()..add(FetchXezaImages()),
-        child: const MyHomePage(title: 'Xeza Earth Gallery'),
+        create: (context) => NasaBloc()..add(FetchNasaImages()),
+        child: const MyHomePage(title: 'Nasa Earth Gallery'),
       ),
     );
   }
