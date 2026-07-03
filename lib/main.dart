@@ -1,14 +1,21 @@
-import 'package:xeza_gallery/screen/home_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'bloc/nasa_bloc_bloc.dart';
+import 'injection/injection_container.dart';
+import 'routes/app_router.dart';
+import 'routes/app_routes.dart';
  
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
  
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key, InjectionContainer? container, AppRouter? appRouter})
+      : container = container ?? InjectionContainer.create(),
+        appRouter = appRouter;
+
+  final InjectionContainer container;
+  final AppRouter? appRouter;
+  late final AppRouter resolvedRouter =
+      appRouter ?? AppRouter(viewModel: container.nasaViewModel);
  
   @override
   Widget build(BuildContext context) {
@@ -22,10 +29,8 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: BlocProvider(
-        create: (context) => NasaBlocBloc(),
-        child: const MyHomePage(title: 'Nasa Earth Gallery'),
-      ),
+      initialRoute: AppRoutes.home,
+      onGenerateRoute: resolvedRouter.onGenerateRoute,
     );
   }
 }

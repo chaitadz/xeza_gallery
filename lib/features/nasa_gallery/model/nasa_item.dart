@@ -21,8 +21,8 @@ class NasaItem {
       center: json['center'] ?? 'NASA',
       dateCreated: json['dateCreated'] ?? '',
       description: json['description'] ?? 'No description available.',
-      imageUrl: json['imageUrl'] ?? 'https://play-lh.googleusercontent.com/ei29iYY5zisiQuJ-GfX3Qpe2BzsLYgJi5-yllcJt4ciYHdgdtWv62kf_v5zLW4wNHw=w7680-h4320-rw',
-      keywords: List<String>.from(json['keywords'] ?? []),
+      imageUrl: json['imageUrl'] ?? '',
+      keywords: List<String>.from(json['keywords'] ?? const <String>[]),
     );
   }
 }

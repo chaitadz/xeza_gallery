@@ -5,26 +5,33 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
+import 'package:xeza_gallery/features/nasa_gallery/model/nasa_item.dart';
+import 'package:xeza_gallery/features/nasa_gallery/repository/nasa_repository.dart';
+import 'package:xeza_gallery/features/nasa_gallery/viewmodel/nasa_viewmodel.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:xeza_gallery/main.dart';
+import 'package:xeza_gallery/routes/app_router.dart';
+
+class FakeNasaRepository implements NasaRepository {
+  @override
+  Future<List<NasaItem>> fetchEarthImages() async {
+    return <NasaItem>[];
+  }
+}
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('renders the gallery shell', (WidgetTester tester) async {
+    final viewModel = NasaViewModel(FakeNasaRepository());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    await tester.pumpWidget(
+      MyApp(
+        appRouter: AppRouter(viewModel: viewModel),
+      ),
+    );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('Nasa Earth Gallery'), findsOneWidget);
   });
 }
