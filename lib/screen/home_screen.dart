@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../nasa_bloc.dart';
-import '../nasa_model.dart';
+import '../bloc/nasa_bloc_bloc.dart';
+import '../model/nasa_model.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -12,37 +12,40 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  void checkPlatform() {
-    if (Theme.of(context).platform == TargetPlatform.android) {
-      debugPrint('Running on Android');
-    } else if (Theme.of(context).platform == TargetPlatform.iOS) {
-      debugPrint('Running on iOS');
-    }
+  
+  // event FetchNasaImages
+  @override
+  void initState() {
+    super.initState();
+    // Fetch images when the widget is first built
+    context.read<NasaBlocBloc>().add(FetchNasaImages());
   }
+  // -------------------------
 
   @override
   Widget build(BuildContext context) {
-    checkPlatform();
-    
     final double screenWidth = MediaQuery.of(context).size.width;
     final int crossAxisCount = screenWidth > 600 ? 3 : 2;
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          widget.title,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
-      body: BlocBuilder<NasaBloc, NasaState>(
+      body: BlocBuilder<NasaBlocBloc, NasaBlocState>(
         builder: (context, state) {
-          if (state is NasaLoading) {
+          if (state is NasaBlocLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-          
-          if (state is NasaError) {
+
+          if (state is NasaBlocError) {
             return Center(child: Text(state.message));
           }
 
-          if (state is NasaLoaded) {
+          if (state is NasaBlocLoaded) {
             final nasaList = state.items;
             return Padding(
               padding: const EdgeInsets.all(12.0),
@@ -68,7 +71,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Card(
                       clipBehavior: Clip.antiAlias,
                       elevation: 3,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -80,7 +85,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                 item.imageUrl,
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) =>
-                                    const Center(child: Icon(Icons.broken_image)),
+                                    const Center(
+                                      child: Icon(Icons.broken_image),
+                                    ),
                               ),
                             ),
                           ),
@@ -89,14 +96,37 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(item.center.toUpperCase(), style: const TextStyle(fontSize: 10, color: Colors.blue, fontWeight: FontWeight.bold)),
+                                Text(
+                                  item.center.toUpperCase(),
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                                 const SizedBox(height: 4),
-                                Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                Text(
+                                  item.title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                ),
                                 const SizedBox(height: 4),
-                                Text(item.description, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+                                Text(
+                                  item.description,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
                               ],
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -140,24 +170,39 @@ class DetailScreen extends StatelessWidget {
                     children: [
                       _buildBadge('Center: ${item.center}', Colors.blue),
                       const SizedBox(width: 8),
-                      _buildBadge('Date: ${item.dateCreated.split('T')[0]}', Colors.green),
+                      _buildBadge(
+                        'Date: ${item.dateCreated.split('T')[0]}',
+                        Colors.green,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Text(item.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                  Text(
+                    item.title,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: 12),
-                  Text(item.description, style: const TextStyle(fontSize: 14, height: 1.5)),
+                  Text(
+                    item.description,
+                    style: const TextStyle(fontSize: 14, height: 1.5),
+                  ),
                   const SizedBox(height: 20),
                   Wrap(
                     spacing: 8,
                     runSpacing: 0,
                     children: item.keywords.map((keyword) {
-                      return Chip(label: Text('#$keyword'), labelStyle: const TextStyle(fontSize: 12));
+                      return Chip(
+                        label: Text('#$keyword'),
+                        labelStyle: const TextStyle(fontSize: 12),
+                      );
                     }).toList(),
-                  )
+                  ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -172,7 +217,14 @@ class DetailScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: color.withOpacity(0.5)),
       ),
-      child: Text(text, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.bold)),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 11,
+          color: color,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 }
