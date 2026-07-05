@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/nasa_bloc_bloc.dart';
-import '../model/nasa_model.dart';
+import '../../data/models/nasa_item_model.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -64,7 +64,15 @@ class _MyHomePageState extends State<MyHomePage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DetailScreen(item: item),
+                          builder: (context) => DetailScreen(
+                            item: NasaItemModel(
+                            title: item.title,
+                            center: item.center,
+                            dateCreated: item.dateCreated,
+                            description: item.description,
+                            imageUrl: item.imageUrl,
+                            keywords: item.keywords,
+                          )),
                         ),
                       );
                     },
@@ -144,7 +152,7 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class DetailScreen extends StatelessWidget {
-  final NasaItem item;
+  final NasaItemModel item;
   const DetailScreen({super.key, required this.item});
 
   @override

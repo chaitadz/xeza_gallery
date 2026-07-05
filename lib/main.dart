@@ -1,7 +1,8 @@
-import 'package:xeza_gallery/screen/home_screen.dart';
+import 'package:xeza_gallery/features/nasa_gallery/presentation/pages/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'bloc/nasa_bloc_bloc.dart';
+import 'package:xeza_gallery/injection_container.dart';
+import 'package:xeza_gallery/core/theme/app_theme.dart';
  
 void main() {
   runApp(const MyApp());
@@ -15,15 +16,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Nasa BLoC Demo',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple, 
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.getDarkTheme(),
       home: BlocProvider(
-        create: (context) => NasaBlocBloc(),
+        // ✅ ใช้ InjectionContainer แทน NasaBlocBloc() โดยตรง
+        create: (context) => InjectionContainer.createNasaBlocBloc(),
         child: const MyHomePage(title: 'Nasa Earth Gallery'),
       ),
     );

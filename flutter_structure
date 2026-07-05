@@ -1,0 +1,47 @@
+lib/
+│
+├── main.dart                                                       # Entry Point ของแอปพลิเคชัน ทำหน้าที่รันแอปและตั้งค่าตั้งต้น
+├── injection_container.dart                                        # ไฟล์สำหรับจัดการ Dependency Injection (DI) (เช่น การจัดเตรียมคลาส Dio, Repository, และ BLoC)
+│
+├── core/                                                           # [Core Layer] เก็บโค้ดส่วนกลางที่ใช้ร่วมกันทุกหน้าจอ/ทุกฟีเจอร์
+│   ├── constants/
+│   │   └── api_constants.dart                                      # เก็บ URL ลิงก์ต่าง ๆ และ API Keys
+│   ├── errors/
+│   │   ├── failures.dart                                           # คลาสจัดการ Error ต่าง ๆ ในระบบ (มักใช้คู่กับแพ็คเกจ dartz เพื่อส่งกลับเป็น Left)
+│   │   └── exceptions.dart                                         # คลาสดักจับ Exception ตอนยิง Network หรือดึงข้อมูลผิดพลาด
+│   ├── network/
+│   │   └── dio_client.dart                                         # คลาสตั้งค่า Dio ตัวกลาง (ใส่ Interceptors, ตั้งค่า Timeout, ตรวจเช็ก Headers)
+│   └── theme/
+│       └── app_theme.dart                                          # เก็บการตั้งค่า ThemeData, สีคุมโทน (Dark/Light mode) ที่ย้ายมาจาก main.dart
+│
+└── features/                                                       # [Features Layer] โฟลเดอร์รวมกลุ่มฟีเจอร์ทั้งหมดของแอป
+    │
+    └── nasa_gallery/                                               # คลังภาพ NASA (แยกโฟลเดอร์ตามชื่อฟีเจอร์)
+        │
+        ├── domain/                                                 # [Domain Layer] หัวใจของฟีเจอร์ เก็บ Business Logic และสัญญา (Contracts) (ห้ามพึ่งพาแพ็คเกจภายนอก)
+        │   ├── entities/
+        │   │   └── nasa_item.dart                                  # คลาสโครงสร้างข้อมูลระดับธุรการ (Pure Dart Object) มีแค่ฟิลด์ตัวแปร ไม่มีเมธอดจากภายนอก
+        │   ├── repositories/
+        │   │   └── nasa_repository.dart                            # สัญญา (Abstract Class) ระบุว่าฟีเจอร์นี้ต้องมีฟังก์ชันอะไรบ้าง (เช่น fetchImages)
+        │   └── usecases/
+        │       └── get_nasa_images.dart                            # คลาสที่รับผิดชอบพฤติกรรมผู้ใช้ 1 อย่าง (Single Responsibility) เช่น สั่งดึงภาพจาก NASA
+        │
+        ├── data/                                                   # [Data Layer] ส่วนติดต่อกับโลกภายนอก (API, ฐานข้อมูล) และการแปลงข้อมูล
+        │   ├── datasources/
+        │   │   ├── nasa_remote_data_source.dart                    # สัญญาของการยิง API
+        │   │   └── nasa_remote_data_source_impl.dart               # การเขียนโค้ดเรียกใช้งาน Dio ยิงไปที่ NASA API จริง ๆ
+        │   ├── models/
+        │   │   └── nasa_item_model.dart                            # คลาสย่อยที่ขยายมาจาก Entity เพิ่มฟังก์ชัน .fromJson() และ .toJson()
+        │   └── repositories/
+        │       └── nasa_repository_impl.dart                       # คลาสที่สืบทอดมาจากสัญญาใน Domain ทำหน้าที่รับข้อมูลจาก DataSource มาจัดการ
+        │
+        └── presentation/                                           # [Presentation Layer] ส่วนควบคุมหน้าจอ การแสดงผล และการจัดการสถานะ (UI)
+            ├── bloc/
+            │   ├── nasa_bloc_bloc.dart                             # พ่อครัวควบคุม Logic: เปลี่ยนสถานะหน้าจอตามคำสั่ง
+            │   ├── nasa_bloc_event.dart                            # รายการคำสั่ง (Event) เช่น FetchNasaImages
+            │   └── nasa_bloc_state.dart                            # รายการสถานะหน้าจอ (State) เช่น Loading, Loaded, Error
+            ├── pages/
+            │   └── home_screen.dart                                # หน้าจอหลักแสดงผลแกลเลอรีภาพ (ย้ายมาจากไฟล์เดิมของคุณ)
+            └── widgets/
+                ├── nasa_image_card.dart                            # Widget ขนาดเล็กที่แยกออกไป เช่น การ์ดแสดงรูปภาพแต่ละชิ้น
+                └── keyword_chip.dart                               # Widget แสดงแท็ก Keywords เพื่อลดความซับซ้อนในไฟล์หน้าหลัก
