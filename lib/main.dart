@@ -18,7 +18,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.getDarkTheme(),
       home: BlocProvider(
-        // ✅ ใช้ InjectionContainer แทน NasaBlocBloc() โดยตรง
         create: (context) => InjectionContainer.createNasaBlocBloc(),
         child: const MyHomePage(title: 'Nasa Earth Gallery'),
       ),

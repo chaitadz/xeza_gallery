@@ -1,4 +1,3 @@
-// lib/features/nasa_gallery/presentation/widgets/nasa_image_card.dart
 import 'package:flutter/material.dart';
 import '../../domain/entities/nasa_item.dart';
 

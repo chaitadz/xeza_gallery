@@ -13,14 +13,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   
-  // event FetchNasaImages
   @override
   void initState() {
     super.initState();
-    // Fetch images when the widget is first built
     context.read<NasaBlocBloc>().add(FetchNasaImages());
   }
-  // -------------------------
 
   @override
   Widget build(BuildContext context) {

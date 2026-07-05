@@ -1,4 +1,3 @@
-// lib/features/nasa_gallery/presentation/widgets/keyword_chip.dart
 import 'package:flutter/material.dart';
 
 class KeywordChip extends StatelessWidget {

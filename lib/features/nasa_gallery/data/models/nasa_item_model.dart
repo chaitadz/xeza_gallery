@@ -1,8 +1,6 @@
-// lib/features/nasa_gallery/data/models/nasa_item_model.dart
 import '../../domain/entities/nasa_item.dart';
 
 class NasaItemModel extends NasaItem {
-  // ✅ Constructor
   NasaItemModel({
     required super.title,
     required super.center,
@@ -12,8 +10,6 @@ class NasaItemModel extends NasaItem {
     required super.keywords,
   });
 
-  // ✅ Factory method สำหรับสร้างจาก JSON
-  // ⚠️ ตรงนี้เป็นที่เดียวที่ Model ใช้ - ใน Data layer เท่านั้น
   factory NasaItemModel.fromJson(Map<String, dynamic> json) {
     return NasaItemModel(
       title: json['title'] ?? 'No Title',
@@ -26,7 +22,6 @@ class NasaItemModel extends NasaItem {
     );
   }
 
-  // ✅ Method แปลงกลับเป็น JSON (ถ้าต้องส่งไป server)
   Map<String, dynamic> toJson() {
     return {
       'title': title,

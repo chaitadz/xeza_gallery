@@ -1,4 +1,3 @@
-// lib/features/nasa_gallery/data/datasources/nasa_remote_data_source_impl.dart
 import 'package:dio/dio.dart';
 import '../models/nasa_item_model.dart';
 import 'nasa_remote_data_source.dart';
@@ -6,7 +5,6 @@ import 'nasa_remote_data_source.dart';
 class NasaRemoteDataSourceImpl implements NasaRemoteDataSource {
   final Dio _dio;
 
-  // ✅ Constructor - รับ Dio instance จากข้างนอก (Dependency Injection)
   NasaRemoteDataSourceImpl(this._dio);
 
   @override
@@ -20,7 +18,6 @@ class NasaRemoteDataSourceImpl implements NasaRemoteDataSource {
         final List<dynamic> items =
             response.data['collection']['items'] ?? [];
 
-        // ✅ Parse JSON → NasaItemModel (ตรงนี้เป็นที่เดียวที่ทำ JSON parsing)
         final List<NasaItemModel> nasaItems = items.map((item) {
           final data = (item['data'] as List).first;
           final links = item['links'] as List?;
