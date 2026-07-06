@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:xeza_gallery/features/nasa_gallery/presentation/widgets/nasa_image_card.dart';
-import '../bloc/nasa_bloc_bloc.dart';
+import 'package:xeza_gallery/features/nasa_gallery/presentation/view/widgets/nasa_image_card.dart';
+import '../../view_model/bloc/nasa/nasa_bloc_bloc.dart';
 import 'detail_screen.dart';
 
 class MyHomePage extends StatefulWidget {

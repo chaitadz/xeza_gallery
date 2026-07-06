@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:xeza_gallery/features/nasa_gallery/presentation/widgets/favorite_button.dart';
-import '../../domain/entities/nasa_item.dart';
+import 'package:xeza_gallery/features/nasa_gallery/presentation/view/widgets/favorite_button.dart';
+import '../../../domain/entities/nasa_item.dart';
 import '../widgets/info_badge.dart';
 import '../widgets/keyword_chip.dart';
 
@@ -21,20 +21,21 @@ class DetailScreen extends StatelessWidget {
               children: [
                 Container(
                   width: double.infinity,
-                  constraints: const BoxConstraints(maxHeight: 400),
+                  height: 300,
                   color: Colors.black,
-                  child: Image.network(item.imageUrl, fit: BoxFit.contain),
+                  child: Image.network(
+                    item.imageUrl,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => const Center(
+                      child: Icon(Icons.broken_image, color: Colors.white54, size: 64),
+                    ),
+                  ),
                 ),
 
                 Positioned(
                   bottom: 16,
                   right: 16,
-                  child: FavoriteButton(
-                    imageUrl: item.imageUrl,
-                    onChanged: () {
-                      print('Favorite toggled');
-                    },
-                  ),
+                  child: FavoriteButton(imageUrl: item.imageUrl),
                 ),
               ],
             ),

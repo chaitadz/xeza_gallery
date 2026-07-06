@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../domain/entities/nasa_item.dart';
+import '../../../domain/entities/nasa_item.dart';
 
 class NasaImageCard extends StatelessWidget {
   final NasaItem item;
