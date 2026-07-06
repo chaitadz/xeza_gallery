@@ -66,6 +66,19 @@ lib/
 
 ---
 
+## Widgets
+
+### `NasaImageCard` ★อัปเดต
+- ใช้ `BlocBuilder<FavoritesBlocBloc>` แสดงไอคอนดาวมุมขวาบนของภาพเมื่อ `isFavorite` เป็น true
+- `buildWhen` กรองเฉพาะเมื่อ favorite status ของภาพนั้นเปลี่ยน (ไม่ rebuild ทุก card เมื่อ favorite card อื่นเปลี่ยน)
+- ไม่มีปุ่มกด — แสดงผลเท่านั้น (กดปุ่มดาวได้ใน DetailScreen)
+
+### `FavoriteButton`
+- ปุ่มดาวแบบกดได้อยู่ใน DetailScreen
+- ใช้ `BlocConsumer<FavoritesBlocBloc>` — listener ขับ animation, builder render icon
+
+---
+
 ## Dependencies
 
 | Package | เวอร์ชัน | หน้าที่ |
@@ -145,21 +158,30 @@ lib/
 ### MVVM Role
 | Layer | Class | หน้าที่ |
 |---|---|---|
-| **View** | `FavoriteButton` | แสดงผล + รับ event จากผู้ใช้ |
-| **ViewModel** | `FavoriteViewModel` | logic: โหลด/บันทึก/ลบ favorites ผ่าน `FavoritesStorage` |
-| **BLoC** (bridge) | `FavoritesBlocBloc` | รับ event → delegate ViewModel → emit state |
+| **View** | `FavoriteButton`, `NasaImageCard` | แสดงผล + รับ event จากผู้ใช้ |
+| **ViewModel** | `FavoriteViewModel` | เก็บ state (`_favorites`), logic ทั้งหมด, เรียก `FavoritesStorage` |
+| **BLoC** (bridge) | `FavoritesBlocBloc` | รับ event → เรียก ViewModel → emit state จาก `_viewModel.favorites` |
+
+`FavoritesBlocBloc` ไม่มี logic เลย — ไม่มี if/else, ไม่มีการอ่าน state เก่า ทุกอย่างอยู่ใน ViewModel
+
+### `FavoriteViewModel` internals
+```dart
+Set<String> _favorites          // state ภายใน
+get favorites                   // expose as unmodifiable
+
+loadFavorites()                 // โหลดจาก storage → เก็บใน _favorites
+toggleFavorite(imageUrl)        // เพิ่ม/ลบใน _favorites + เขียน storage
+```
 
 ### Flow
 ```
 FavoritesBlocBloc สร้าง → add(LoadFavorites)
-    → FavoriteViewModel.loadFavorites()
-    → FavoritesStorage.getAllFavorites()
-    → emit FavoritesBlocLoaded({...urls})
+    → _viewModel.loadFavorites() → FavoritesStorage → เก็บใน _favorites
+    → emit FavoritesBlocLoaded(_viewModel.favorites)
 
 ผู้ใช้กดดาว → add(ToggleFavorite(url))
-    → FavoriteViewModel.toggleFavorite(currentUrls, url)
-    → FavoritesStorage.saveFavorite / removeFavorite
-    → emit FavoritesBlocLoaded(updatedSet)
+    → _viewModel.toggleFavorite(url) → FavoritesStorage → อัปเดต _favorites
+    → emit FavoritesBlocLoaded(_viewModel.favorites)
     → FavoriteButton BlocConsumer rebuild + animate
 ```
 
@@ -179,8 +201,9 @@ FavoritesBlocBloc สร้าง → add(LoadFavorites)
 
 ### Model: `NasaItemModel`
 - `extends NasaItem`
-- `fromJson()` — แปลง API response พร้อม default values
+- `fromJson()` — cast ทุก field ด้วย `as String?` และ `as List<dynamic>?` อย่างชัดเจน พร้อม default values
 - `toJson()` — แปลงกลับเป็น JSON
+- `keywords` ใช้ `.map((e) => e as String)` แทน `List<String>.from()`
 
 ---
 
@@ -188,7 +211,12 @@ FavoritesBlocBloc สร้าง → add(LoadFavorites)
 
 ### `NasaRemoteDataSourceImpl`
 - ใช้ Dio เรียก NASA API
-- parse nested JSON → `List<NasaItemModel>`
+- cast response อย่างมี type safety:
+  - `response.data['collection']['items'] as List<dynamic>?`
+  - แต่ละ item cast เป็น `Map<String, dynamic>`
+  - `data` (first element) cast เป็น `Map<String, dynamic>`
+  - `links` cast เป็น `List<dynamic>?`, `links.first` cast เป็น `Map<String, dynamic>`
+  - field strings cast ด้วย `as String?`
 - มี fallback image URL เมื่อ API ไม่ส่ง links
 
 ### `NasaRepositoryImpl`

@@ -10,16 +10,13 @@ class FavoritesBlocBloc extends Bloc<FavoritesBlocEvent, FavoritesBlocState> {
 
   FavoritesBlocBloc(this._viewModel) : super(FavoritesBlocInitial()) {
     on<LoadFavorites>((event, emit) async {
-      final urls = await _viewModel.loadFavorites();
-      emit(FavoritesBlocLoaded(urls));
+      await _viewModel.loadFavorites();
+      emit(FavoritesBlocLoaded(_viewModel.favorites));
     });
 
     on<ToggleFavorite>((event, emit) async {
-      final current = state;
-      if (current is! FavoritesBlocLoaded) return;
-      final urls = await _viewModel.toggleFavorite(
-          current.favoriteUrls, event.imageUrl);
-      emit(FavoritesBlocLoaded(urls));
+      await _viewModel.toggleFavorite(event.imageUrl);
+      emit(FavoritesBlocLoaded(_viewModel.favorites));
     });
   }
 }

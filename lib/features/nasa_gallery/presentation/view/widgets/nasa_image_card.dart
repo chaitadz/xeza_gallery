@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/nasa_item.dart';
+import '../../view_model/bloc/favorite/favorites_bloc_bloc.dart';
 
 class NasaImageCard extends StatelessWidget {
   final NasaItem item;
@@ -23,15 +25,50 @@ class NasaImageCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: Container(
-                width: double.infinity,
-                color: Colors.black,
-                child: Image.network(
-                  item.imageUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Center(child: Icon(Icons.broken_image)),
-                ),
+              child: Stack(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    color: Colors.black,
+                    child: Image.network(
+                      item.imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Center(child: Icon(Icons.broken_image)),
+                    ),
+                  ),
+                  BlocBuilder<FavoritesBlocBloc, FavoritesBlocState>(
+                    buildWhen: (prev, curr) {
+                      if (prev is FavoritesBlocLoaded &&
+                          curr is FavoritesBlocLoaded) {
+                        return prev.isFavorite(item.imageUrl) !=
+                            curr.isFavorite(item.imageUrl);
+                      }
+                      return prev != curr;
+                    },
+                    builder: (context, state) {
+                      final isFavorite = state is FavoritesBlocLoaded &&
+                          state.isFavorite(item.imageUrl);
+                      if (!isFavorite) return const SizedBox.shrink();
+                      return Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.5),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                            size: 16,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
             Padding(

@@ -1,21 +1,22 @@
 import 'package:xeza_gallery/core/storage/favorites_storage.dart';
 
 class FavoriteViewModel {
-  Future<Set<String>> loadFavorites() async {
+  Set<String> _favorites = {};
+
+  Set<String> get favorites => Set.unmodifiable(_favorites);
+
+  Future<void> loadFavorites() async {
     final urls = await FavoritesStorage.getAllFavorites();
-    return urls.toSet();
+    _favorites = urls.toSet();
   }
 
-  Future<Set<String>> toggleFavorite(
-      Set<String> currentUrls, String imageUrl) async {
-    final urls = Set<String>.from(currentUrls);
-    if (urls.contains(imageUrl)) {
+  Future<void> toggleFavorite(String imageUrl) async {
+    if (_favorites.contains(imageUrl)) {
       await FavoritesStorage.removeFavorite(imageUrl);
-      urls.remove(imageUrl);
+      _favorites.remove(imageUrl);
     } else {
       await FavoritesStorage.saveFavorite(imageUrl);
-      urls.add(imageUrl);
+      _favorites.add(imageUrl);
     }
-    return urls;
   }
 }
