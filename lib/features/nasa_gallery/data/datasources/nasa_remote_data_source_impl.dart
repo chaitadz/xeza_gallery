@@ -16,34 +16,35 @@ class NasaRemoteDataSourceImpl implements NasaRemoteDataSource {
 
       if (response.statusCode == 200) {
         final List<dynamic> items =
-            response.data['collection']['items'] ?? [];
+            response.data['collection']['items'] as List<dynamic>? ?? [];
 
-        final List<NasaItemModel> nasaItems = items.map((item) {
-          final data = (item['data'] as List).first;
-          final links = item['links'] as List?;
+        final List<NasaItemModel> nasaItems = items.map((raw) {
+          final item = raw as Map<String, dynamic>;
+          final data =
+              (item['data'] as List<dynamic>).first as Map<String, dynamic>;
+          final links = item['links'] as List<dynamic>?;
 
           String imageUrl =
               'https://play-lh.googleusercontent.com/ei29iYY5zisiQuJ-GfX3Qpe2BzsLYgJi5-yllcJt4ciYHdgdtWv62kf_v5zLW4wNHw=w7680-h4320-rw';
 
           if (links != null && links.isNotEmpty) {
-            imageUrl = links.first['href'] ?? imageUrl;
+            final firstLink = links.first as Map<String, dynamic>;
+            imageUrl = firstLink['href'] as String? ?? imageUrl;
           }
 
           return NasaItemModel.fromJson({
-            'title': data['title'],
-            'center': data['center'],
-            'dateCreated': data['date_created'],
-            'description': data['description'],
+            'title': data['title'] as String?,
+            'center': data['center'] as String?,
+            'dateCreated': data['date_created'] as String?,
+            'description': data['description'] as String?,
             'imageUrl': imageUrl,
-            'keywords': data['keywords'] ?? [],
+            'keywords': data['keywords'] as List<dynamic>? ?? [],
           });
         }).toList();
 
         return nasaItems;
       } else {
-        throw Exception(
-          'เซิร์ฟเวอร์ตอบกลับผิดพลาด: ${response.statusCode}',
-        );
+        throw Exception('เซิร์ฟเวอร์ตอบกลับผิดพลาด: ${response.statusCode}');
       }
     } on DioException catch (e) {
       throw Exception('Network error: ${e.message}');

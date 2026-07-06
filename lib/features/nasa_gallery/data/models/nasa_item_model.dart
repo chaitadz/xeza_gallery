@@ -12,13 +12,16 @@ class NasaItemModel extends NasaItem {
 
   factory NasaItemModel.fromJson(Map<String, dynamic> json) {
     return NasaItemModel(
-      title: json['title'] ?? 'No Title',
-      center: json['center'] ?? 'NASA',
-      dateCreated: json['dateCreated'] ?? '',
-      description: json['description'] ?? 'No description available.',
-      imageUrl: json['imageUrl'] ??
+      title: json['title'] as String? ?? 'No Title',
+      center: json['center'] as String? ?? 'NASA',
+      dateCreated: json['dateCreated'] as String? ?? '',
+      description: json['description'] as String? ?? 'No description available.',
+      imageUrl: json['imageUrl'] as String? ??
           'https://play-lh.googleusercontent.com/ei29iYY5zisiQuJ-GfX3Qpe2BzsLYgJi5-yllcJt4ciYHdgdtWv62kf_v5zLW4wNHw=w7680-h4320-rw',
-      keywords: List<String>.from(json['keywords'] ?? []),
+      keywords: (json['keywords'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
     );
   }
 
