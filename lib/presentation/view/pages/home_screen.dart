@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:xeza_gallery/features/nasa_gallery/presentation/view/widgets/nasa_image_card.dart';
-import '../../view_model/bloc/nasa/nasa_bloc_bloc.dart';
+import 'package:xeza_gallery/presentation/view/widgets/nasa_image_card.dart';
+import '../../bloc/nasa/nasa_bloc_bloc.dart';
 import 'detail_screen.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -13,7 +13,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  
   @override
   void initState() {
     super.initState();
@@ -35,14 +34,19 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: BlocBuilder<NasaBlocBloc, NasaBlocState>(
         builder: (context, state) {
+          // ====== loading state
           if (state is NasaBlocLoading) {
             return const Center(child: CircularProgressIndicator());
           }
+          // =========================================
 
+          // ====== error state
           if (state is NasaBlocError) {
             return Center(child: Text(state.message));
           }
+          // =========================================
 
+          // ====== loaded state
           if (state is NasaBlocLoaded) {
             final nasaList = state.items;
             return Padding(
@@ -65,6 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         MaterialPageRoute(
                           builder: (_) => DetailScreen(
                             item: item,
+                            //callBackRoute: 'main'
                           ),
                         ),
                       );
@@ -75,6 +80,9 @@ class _MyHomePageState extends State<MyHomePage> {
             );
           }
 
+          // =========================================
+          
+          // ====== unknown state
           return const Center(child: Text('ไม่มีข้อมูล'));
         },
       ),

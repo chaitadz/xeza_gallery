@@ -3,9 +3,9 @@ import '../models/nasa_item_model.dart';
 import 'nasa_remote_data_source.dart';
 
 class NasaRemoteDataSourceImpl implements NasaRemoteDataSource {
-  final Dio _dio;
+  NasaRemoteDataSourceImpl();
 
-  NasaRemoteDataSourceImpl(this._dio);
+  final _dio = Dio();
 
   @override
   Future<List<NasaItemModel>> fetchImages() async {

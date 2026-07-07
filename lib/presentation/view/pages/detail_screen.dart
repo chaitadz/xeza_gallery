@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:xeza_gallery/features/nasa_gallery/presentation/view/widgets/favorite_button.dart';
-import '../../../domain/entities/nasa_item.dart';
+import 'package:xeza_gallery/presentation/view/widgets/favorite_button.dart';
+import '../../../repository/domain/entities/nasa_item.dart';
 import '../widgets/info_badge.dart';
 import '../widgets/keyword_chip.dart';
 
@@ -12,7 +12,7 @@ class DetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(item.title)),
+      appBar: AppBar(title: Text(item.title )),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

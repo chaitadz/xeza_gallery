@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../domain/entities/nasa_item.dart';
-import '../../view_model/bloc/favorite/favorites_bloc_bloc.dart';
+import '../../../repository/domain/entities/nasa_item.dart';
+import '../../bloc/favorite/favorites_bloc_bloc.dart';
 
 class NasaImageCard extends StatelessWidget {
   final NasaItem item;
@@ -18,6 +18,7 @@ class NasaImageCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Card(
+        key: ValueKey('onTap_card'),
         clipBehavior: Clip.antiAlias,
         elevation: 3,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:xeza_gallery/features/nasa_gallery/presentation/view_model/bloc/favorite/favorites_bloc_bloc.dart';
+import 'package:xeza_gallery/presentation/bloc/favorite/favorites_bloc_bloc.dart';
 
 class FavoriteButton extends StatefulWidget {
   final String imageUrl;
@@ -45,10 +45,6 @@ class _FavoriteButtonState extends State<FavoriteButton>
     return BlocConsumer<FavoritesBlocBloc, FavoritesBlocState>(
       listenWhen: (prev, curr) {
         if (curr is! FavoritesBlocLoaded) return false;
-        if (prev is FavoritesBlocLoaded) {
-          return prev.isFavorite(widget.imageUrl) !=
-              curr.isFavorite(widget.imageUrl);
-        }
         return true;
       },
       listener: (context, state) {

@@ -1,16 +1,4 @@
-# สรุปโปรเจกต์ xeza_gallery
-
-## ภาพรวม
-
-**xeza_gallery** คือแอปพลิเคชัน Flutter สำหรับแสดงภาพถ่ายโลก (Earth) จาก NASA Image API
-โดยใช้สถาปัตยกรรม **Clean Architecture + MVVM** ร่วมกับ **BLoC Pattern** โดย BLoC ทำหน้าที่เป็น bridge บาง ๆ ส่วน logic จริงอยู่ใน ViewModel
-
-| รายละเอียด | ค่า |
-|---|---|
-| ชื่อโปรเจกต์ | `xeza_gallery` |
-| เวอร์ชัน | 1.0.0+1 |
-| Flutter SDK | ^3.12.2 |
-| ธีม | Dark Theme / Material 3 / สีม่วง |
+# สรุปโปรเจกต์ xeza_gallery — อธิบายทุกไฟล์
 
 ---
 
@@ -18,8 +6,8 @@
 
 ```
 lib/
-├── main.dart                                      # จุดเริ่มต้นของแอป (MultiBlocProvider)
-├── injection_container.dart                       # สร้างและฉีด dependencies
+├── main.dart
+├── injection_container.dart
 ├── core/
 │   ├── constants/api_constants.dart              # (ว่างเปล่า)
 │   ├── errors/
@@ -66,236 +54,535 @@ lib/
 
 ---
 
-## Widgets
-
-### `NasaImageCard` ★อัปเดต
-- ใช้ `BlocBuilder<FavoritesBlocBloc>` แสดงไอคอนดาวมุมขวาบนของภาพเมื่อ `isFavorite` เป็น true
-- `buildWhen` กรองเฉพาะเมื่อ favorite status ของภาพนั้นเปลี่ยน (ไม่ rebuild ทุก card เมื่อ favorite card อื่นเปลี่ยน)
-- ไม่มีปุ่มกด — แสดงผลเท่านั้น (กดปุ่มดาวได้ใน DetailScreen)
-
-### `FavoriteButton`
-- ปุ่มดาวแบบกดได้อยู่ใน DetailScreen
-- ใช้ `BlocConsumer<FavoritesBlocBloc>` — listener ขับ animation, builder render icon
+## อธิบายทุกไฟล์
 
 ---
 
-## Dependencies
+### `main.dart`
+**หน้าที่:** จุดเริ่มต้นของแอป
 
-| Package | เวอร์ชัน | หน้าที่ |
-|---|---|---|
-| `flutter_bloc` | ^9.1.1 | State Management (BLoC Pattern) |
-| `dio` | ^5.9.2 | HTTP Client สำหรับเรียก API |
-| `get_storage` | ^2.1.1 | Local Storage สำหรับบันทึก Favorites |
-| `dartz` | ^0.10.1 | Functional Programming (import แต่ยังไม่ได้ใช้) |
-| `http` | ^1.6.0 | HTTP Client สำรอง (import แต่ยังไม่ได้ใช้) |
-| `platform` | ^3.1.6 | ตรวจสอบ Platform |
-| `cupertino_icons` | ^1.0.8 | ไอคอนสไตล์ iOS |
-
----
-
-## API
-
-**NASA Images API**
-- **URL:** `https://images-api.nasa.gov/search?q=earth&media_type=image`
-- **Method:** GET
-- **Auth:** ไม่ต้องใช้ API Key (Public endpoint)
-
-**รูปแบบ JSON Response:**
-```json
-{
-  "collection": {
-    "items": [
-      {
-        "data": [{ "title", "center", "date_created", "description", "keywords" }],
-        "links": [{ "href": "<image_url>" }]
-      }
-    ]
-  }
+```dart
+void main() async {
+  await GetStorage.init();   // เปิด local storage ก่อนแอปขึ้น
+  runApp(const MyApp());
 }
 ```
 
----
-
-## BLoC — NASA Gallery
-
-### Events
-| Event | คำอธิบาย |
-|---|---|
-| `FetchNasaImages` | สั่งให้โหลดภาพจาก NASA API |
-
-### States
-| State | คำอธิบาย |
-|---|---|
-| `NasaBlocInitial` | สถานะเริ่มต้น |
-| `NasaBlocLoading` | กำลังโหลดข้อมูล |
-| `NasaBlocLoaded(items)` | โหลดสำเร็จ มี List ภาพ |
-| `NasaBlocError(message)` | เกิดข้อผิดพลาด |
+- `GetStorage.init()` ต้อง await ก่อนเสมอ มิฉะนั้น favorites จะอ่านค่าไม่ได้
+- `MultiBlocProvider` วางอยู่เหนือ `MaterialApp` เพื่อให้ทุก route ที่ push ผ่าน `Navigator` เข้าถึง BLoC ทั้งสองได้
+- สร้าง BLoC ทั้งสองผ่าน `InjectionContainer`
 
 ---
 
-## BLoC — Favorites ★ใหม่
+### `injection_container.dart`
+**หน้าที่:** โรงงาน wiring dependencies ทั้งหมดไว้ที่เดียว
 
-ใช้ชื่อไฟล์และ class ตาม pattern เดียวกับ `NasaBlocBloc`
-
-| ไฟล์ | Class |
-|---|---|
-| `favorites_bloc_bloc.dart` | `FavoritesBlocBloc` |
-| `favorites_bloc_event.dart` | `FavoritesBlocEvent` |
-| `favorites_bloc_state.dart` | `FavoritesBlocState` |
-
-### Events
-| Event | คำอธิบาย |
-|---|---|
-| `LoadFavorites` | โหลดรายการโปรดทั้งหมดจาก local storage ตอน init |
-| `ToggleFavorite(imageUrl)` | เพิ่ม/ลบ favorite ของภาพนั้น ๆ |
-
-### States
-| State | คำอธิบาย |
-|---|---|
-| `FavoritesBlocInitial` | สถานะเริ่มต้นก่อนโหลด |
-| `FavoritesBlocLoaded(favoriteUrls)` | มี `Set<String>` ของ URL ที่บันทึกไว้ พร้อม `isFavorite(url)` |
-
-### MVVM Role
-| Layer | Class | หน้าที่ |
-|---|---|---|
-| **View** | `FavoriteButton`, `NasaImageCard` | แสดงผล + รับ event จากผู้ใช้ |
-| **ViewModel** | `FavoriteViewModel` | เก็บ state (`_favorites`), logic ทั้งหมด, เรียก `FavoritesStorage` |
-| **BLoC** (bridge) | `FavoritesBlocBloc` | รับ event → เรียก ViewModel → emit state จาก `_viewModel.favorites` |
-
-`FavoritesBlocBloc` ไม่มี logic เลย — ไม่มี if/else, ไม่มีการอ่าน state เก่า ทุกอย่างอยู่ใน ViewModel
-
-### `FavoriteViewModel` internals
 ```dart
-Set<String> _favorites          // state ภายใน
-get favorites                   // expose as unmodifiable
+// NASA flow
+Dio → NasaRemoteDataSourceImpl → NasaRepositoryImpl → NasaBlocBloc
 
-loadFavorites()                 // โหลดจาก storage → เก็บใน _favorites
-toggleFavorite(imageUrl)        // เพิ่ม/ลบใน _favorites + เขียน storage
+// Favorites flow
+FavoriteViewModel → FavoritesBlocBloc → ..add(LoadFavorites())
 ```
 
-### Flow
-```
-FavoritesBlocBloc สร้าง → add(LoadFavorites)
-    → _viewModel.loadFavorites() → FavoritesStorage → เก็บใน _favorites
-    → emit FavoritesBlocLoaded(_viewModel.favorites)
-
-ผู้ใช้กดดาว → add(ToggleFavorite(url))
-    → _viewModel.toggleFavorite(url) → FavoritesStorage → อัปเดต _favorites
-    → emit FavoritesBlocLoaded(_viewModel.favorites)
-    → FavoriteButton BlocConsumer rebuild + animate
-```
+- ใช้ `..add(LoadFavorites())` (cascade operator) โหลด favorites จาก storage ทันทีที่ bloc ถูกสร้าง
+- ไม่มี singleton — สร้าง instance ใหม่ทุกครั้งที่เรียก
 
 ---
 
-## Domain Layer
+## core/
 
-### Entity: `NasaItem`
-| Field | Type | คำอธิบาย |
+---
+
+### `core/storage/favorites_storage.dart`
+**หน้าที่:** จัดการ read/write รายการโปรดใน local storage
+
+- ใช้ `GetStorage` เก็บข้อมูลเป็น key `'nasa_favorites'` → `List<String>` ของ image URL
+- `_getAllSync()` อ่านข้อมูลแบบ sync แล้ว cast `List<dynamic>` → `List<String>`
+- `saveFavorite(url)` — ตรวจก่อนว่ามีอยู่แล้วหรือยัง ถ้าไม่มีจึงเพิ่ม
+- `removeFavorite(url)` — ลบด้วย `removeWhere`
+- `getAllFavorites()` — คืน `List<String>` ทั้งหมด (ใช้โดย `FavoriteViewModel`)
+
+---
+
+### `core/theme/app_theme.dart`
+**หน้าที่:** กำหนดธีมของแอป
+
+- Dark Theme ด้วย `ColorScheme.fromSeed(seedColor: Colors.deepPurple, brightness: Brightness.dark)`
+- ใช้ Material 3 (`useMaterial3: true`)
+
+---
+
+## data/
+
+---
+
+### `data/datasources/nasa_remote_data_source.dart`
+**หน้าที่:** Abstract interface กำหนด contract ของ data source
+
+```dart
+abstract class NasaRemoteDataSource {
+  Future<List<NasaItemModel>> fetchImages();
+}
+```
+
+- บังคับให้ implementation ต้องมี `fetchImages()`
+- ทำให้ swap implementation ได้ง่าย (เช่น เปลี่ยนจาก Dio เป็น http)
+
+---
+
+### `data/datasources/nasa_remote_data_source_impl.dart`
+**หน้าที่:** ดึงข้อมูลจาก NASA API และ parse JSON
+
+- GET `https://images-api.nasa.gov/search?q=earth&media_type=image`
+- cast ทุก field อย่าง type-safe:
+  - `raw as Map<String, dynamic>`
+  - `(item['data'] as List<dynamic>).first as Map<String, dynamic>`
+  - `item['links'] as List<dynamic>?`
+  - field strings ใช้ `as String?`
+- fallback image URL ถ้า links ว่าง
+- จัดการ error แบ่งเป็น `DioException` (network) และ `Exception` ทั่วไป
+
+---
+
+### `data/models/nasa_item_model.dart`
+**หน้าที่:** Data model สำหรับ serialize/deserialize ข้อมูลจาก API
+
+- `extends NasaItem` — รับ property ทั้งหมดจาก entity
+- `fromJson()` — แปลง `Map<String, dynamic>` เป็น object พร้อม default ทุก field
+  - ทุก field cast ด้วย `as String? ?? 'default'`
+  - `keywords` ใช้ `.map((e) => e as String)` แทน `List<String>.from()`
+- `toJson()` — แปลงกลับเป็น Map (ใช้สำหรับ debug หรือ cache)
+
+---
+
+## domain/
+
+---
+
+### `domain/entities/nasa_item.dart`
+**หน้าที่:** Entity หลักของโปรเจกต์ — pure Dart class ไม่มี dependency ใด ๆ
+
+| Field | Type | ความหมาย |
 |---|---|---|
 | `title` | String | ชื่อภาพ |
-| `center` | String | ชื่อศูนย์ NASA |
+| `center` | String | ศูนย์ NASA ที่ถ่าย |
 | `dateCreated` | String | วันที่สร้าง (ISO format) |
 | `description` | String | คำอธิบาย |
 | `imageUrl` | String | URL ของภาพ |
-| `keywords` | List\<String\> | คีย์เวิร์ด |
-
-### Model: `NasaItemModel`
-- `extends NasaItem`
-- `fromJson()` — cast ทุก field ด้วย `as String?` และ `as List<dynamic>?` อย่างชัดเจน พร้อม default values
-- `toJson()` — แปลงกลับเป็น JSON
-- `keywords` ใช้ `.map((e) => e as String)` แทน `List<String>.from()`
+| `keywords` | List\<String\> | คีย์เวิร์ดของภาพ |
 
 ---
 
-## Data Layer
+### `domain/repositories/nasa_repository.dart`
+**หน้าที่:** Abstract interface กำหนด contract ของ repository
 
-### `NasaRemoteDataSourceImpl`
-- ใช้ Dio เรียก NASA API
-- cast response อย่างมี type safety:
-  - `response.data['collection']['items'] as List<dynamic>?`
-  - แต่ละ item cast เป็น `Map<String, dynamic>`
-  - `data` (first element) cast เป็น `Map<String, dynamic>`
-  - `links` cast เป็น `List<dynamic>?`, `links.first` cast เป็น `Map<String, dynamic>`
-  - field strings cast ด้วย `as String?`
-- มี fallback image URL เมื่อ API ไม่ส่ง links
-
-### `NasaRepositoryImpl`
-- รับ `NasaRemoteDataSource` ผ่าน constructor
-- ส่งต่อ call ไปที่ data source คืนค่า `List<NasaItem>`
-
----
-
-## Presentation Layer
-
-### `main.dart` — MultiBlocProvider ★อัปเดต
-```
-MultiBlocProvider
-  ├── BlocProvider(NasaBlocBloc)        ← โหลดภาพ NASA
-  └── BlocProvider(FavoritesBlocBloc)   ← จัดการ favorites
-      └── MaterialApp
-            └── MyHomePage / DetailScreen / ...
-```
-`MultiBlocProvider` อยู่เหนือ `MaterialApp` เพื่อให้ทุก route ที่ push ผ่าน `Navigator` เข้าถึง BLoC ได้ (รวมถึง `DetailScreen`)
-
-### `injection_container.dart` ★อัปเดต
 ```dart
-InjectionContainer.createNasaBlocBloc()       // Dio → DataSource → Repo → NasaBlocBloc
-InjectionContainer.createFavoritesBlocBloc()  // FavoriteViewModel → FavoritesBlocBloc + LoadFavorites
+abstract class NasaRepository {
+  Future<List<NasaItem>> fetchImages();
+}
 ```
 
-### `DetailScreen` ★อัปเดต
-- ภาพใช้ความสูงคงที่ `height: 300` (แทน `constraints: BoxConstraints(maxHeight: 400)` ที่ทำให้ Stack ไม่รู้ขนาด)
-- เพิ่ม `errorBuilder` แสดงไอคอน `broken_image` เมื่อโหลดภาพไม่สำเร็จ
-- ปุ่มดาวแสดงผลได้ถูกต้องเพราะ `FavoritesBlocBloc` อยู่เหนือ `MaterialApp`
+- Domain layer ไม่รู้จัก implementation — รู้จักแค่ interface นี้
+- `NasaBlocBloc` ใช้ type นี้ ไม่ใช่ impl โดยตรง
 
-### `FavoriteButton` ★อัปเดต
-- ลบ local state ออกทั้งหมด (`_isFavorite`, `_isLoading`, async methods)
-- คง `AnimationController` ไว้ (ต้องการ `StatefulWidget`)
-- ใช้ `BlocConsumer<FavoritesBlocBloc, FavoritesBlocState>`:
-  - `listener` — เรียก `forward()`/`reverse()` เมื่อ favorite status เปลี่ยน
-  - `builder` — render ไอคอนดาวตาม BLoC state
+---
+
+### `domain/repositories/nasa_repository_impl.dart`
+**หน้าที่:** Implementation ของ repository ส่งต่อ call ไปยัง data source
+
+```dart
+Future<List<NasaItem>> fetchImages() async {
+  return await remoteDataSource.fetchImages();
+  // NasaItemModel extends NasaItem → return ได้โดยตรง
+}
+```
+
+- รับ `NasaRemoteDataSource` ผ่าน constructor (dependency injection)
+- ทำหน้าที่เป็น adapter ระหว่าง domain กับ data layer
+
+---
+
+## presentation/view_model/
+
+---
+
+### `view_model/favorite_view_model.dart`
+**หน้าที่:** ViewModel ของ MVVM — เก็บ state และ logic ของ Favorites ทั้งหมด
+
+```dart
+Set<String> _favorites = {};                          // state ภายใน
+Set<String> get favorites => Set.unmodifiable(_favorites); // expose อ่านอย่างเดียว
+
+Future<void> loadFavorites()            // โหลดจาก storage → เก็บใน _favorites
+Future<void> toggleFavorite(imageUrl)   // เพิ่ม/ลบใน _favorites + เขียน storage
+```
+
+- `FavoritesBlocBloc` ไม่มี logic เลย — delegate ทุกอย่างมาที่นี่
+- `Set.unmodifiable()` ป้องกันการแก้ไข set จากภายนอก
+
+---
+
+### `view_model/bloc/nasa/nasa_bloc_event.dart`
+**หน้าที่:** กำหนด events ของ NASA BLoC
+
+```dart
+sealed class NasaBlocEvent {}
+final class FetchNasaImages extends NasaBlocEvent {}
+```
+
+- มีแค่ event เดียว — ใช้ตอนเริ่มแอปใน `initState` ของ `MyHomePage`
+
+---
+
+### `view_model/bloc/nasa/nasa_bloc_state.dart`
+**หน้าที่:** กำหนด states ของ NASA BLoC
+
+| State | ข้อมูล | แสดงผล |
+|---|---|---|
+| `NasaBlocInitial` | — | ข้อความ "ไม่มีข้อมูล" |
+| `NasaBlocLoading` | — | CircularProgressIndicator |
+| `NasaBlocLoaded` | `List<NasaItem> items` | GridView |
+| `NasaBlocError` | `String message` | ข้อความ error |
+
+---
+
+### `view_model/bloc/nasa/nasa_bloc_bloc.dart`
+**หน้าที่:** จัดการ flow การโหลดภาพ NASA
+
+```dart
+on<FetchNasaImages>((event, emit) async {
+  emit(NasaBlocLoading());
+  try {
+    final items = await repository.fetchImages();
+    emit(NasaBlocLoaded(items));
+  } catch (e) {
+    emit(NasaBlocError('เกิดข้อผิดพลาด: $e'));
+  }
+});
+```
+
+- รับ `NasaRepository` ผ่าน constructor
+- มี logic การจัดการ error อยู่ที่นี่
+
+---
+
+### `view_model/bloc/favorite/favorites_bloc_event.dart`
+**หน้าที่:** กำหนด events ของ Favorites BLoC
+
+```dart
+final class LoadFavorites extends FavoritesBlocEvent {}
+// ยิงตอนสร้าง bloc — โหลด favorites จาก storage
+
+final class ToggleFavorite extends FavoritesBlocEvent {
+  final String imageUrl;  // URL ของภาพที่ต้องการ toggle
+}
+// ยิงเมื่อกดปุ่มดาวใน FavoriteButton
+```
+
+---
+
+### `view_model/bloc/favorite/favorites_bloc_state.dart`
+**หน้าที่:** กำหนด states ของ Favorites BLoC
+
+```dart
+final class FavoritesBlocInitial extends FavoritesBlocState {}
+// state เริ่มต้นก่อน LoadFavorites เสร็จ
+
+final class FavoritesBlocLoaded extends FavoritesBlocState {
+  final Set<String> favoriteUrls;
+  bool isFavorite(String imageUrl) => favoriteUrls.contains(imageUrl);
+}
+// state หลัก — ทุก widget อ่านผ่าน isFavorite()
+```
+
+---
+
+### `view_model/bloc/favorite/favorites_bloc_bloc.dart`
+**หน้าที่:** BLoC บาง ๆ — รับ event → delegate ViewModel → emit state (ไม่มี logic)
+
+```dart
+on<LoadFavorites>((event, emit) async {
+  await _viewModel.loadFavorites();
+  emit(FavoritesBlocLoaded(_viewModel.favorites));
+});
+
+on<ToggleFavorite>((event, emit) async {
+  await _viewModel.toggleFavorite(event.imageUrl);
+  emit(FavoritesBlocLoaded(_viewModel.favorites));
+});
+```
+
+- ไม่มี if/else, ไม่มีการอ่าน state เก่า — ทุกอย่างอยู่ใน `FavoriteViewModel`
+
+---
+
+## presentation/view/
+
+---
+
+### `view/pages/home_screen.dart`
+**หน้าที่:** หน้าแรกของแอป — แสดง Grid ภาพ NASA
+
+- `initState` ยิง `FetchNasaImages` event
+- `BlocBuilder<NasaBlocBloc>` render ตาม state:
+  - Loading → `CircularProgressIndicator`
+  - Error → ข้อความ error
+  - Loaded → `GridView.builder`
+  - Initial → ข้อความ "ไม่มีข้อมูล"
+- Responsive: `screenWidth > 600` → 3 คอลัมน์, อื่น ๆ → 2 คอลัมน์
+- กด card → `Navigator.push` ไป `DetailScreen`
+
+---
+
+### `view/pages/detail_screen.dart`
+**หน้าที่:** หน้ารายละเอียดภาพ
+
+- รับ `NasaItem` เป็น parameter
+- ภาพ: `height: 300`, `BoxFit.contain`, พื้นหลังดำ, มี `errorBuilder`
+- `FavoriteButton` วางด้วย `Positioned(bottom: 16, right: 16)` ซ้อนบนภาพ
+- แสดง `InfoBadge` (center + วันที่), title, description, keywords
+
+---
+
+### `view/widgets/nasa_image_card.dart`
+**หน้าที่:** Card แต่ละอันในหน้า Home
+
+- แสดงภาพ (`BoxFit.cover`), center, title (1 บรรทัด), description (2 บรรทัด)
+- `BlocBuilder<FavoritesBlocBloc>` แสดงไอคอนดาวเล็กมุมขวาบนถ้า `isFavorite`
+- `buildWhen` rebuild เฉพาะเมื่อ favorite status ของ URL นั้นเปลี่ยน
+- กด → เรียก `onTap` callback (navigate ไป detail)
+
+---
+
+### `view/widgets/favorite_button.dart`
+**หน้าที่:** ปุ่มดาวกดได้ใน DetailScreen พร้อม animation
+
+- `StatefulWidget` เพื่อถือ `AnimationController` (scale 1.0 → 1.15, elasticOut, 500ms)
+- `initState` sync animation กับ BLoC state ปัจจุบันผ่าน `addPostFrameCallback`
+- `BlocConsumer`:
+  - `listener` — forward/reverse animation เมื่อ favorite status เปลี่ยน
+  - `builder` — render `Icons.star` หรือ `Icons.star_border`
 - กดปุ่ม → `context.read<FavoritesBlocBloc>().add(ToggleFavorite(imageUrl))`
-- ลบ `onChanged` callback ออกแล้ว
 
 ---
 
-## Local Storage
+### `view/widgets/info_badge.dart`
+**หน้าที่:** Badge แสดงข้อมูล metadata
 
-```dart
-FavoritesStorage.getAllFavorites()       // โหลดทั้งหมด (ใช้ใน LoadFavorites)
-FavoritesStorage.saveFavorite(url)      // บันทึก (ใช้ใน ToggleFavorite)
-FavoritesStorage.removeFavorite(url)    // ลบ (ใช้ใน ToggleFavorite)
-```
-
-**Storage Key:** `'nasa_favorites'` — เก็บเป็น `List<String>` ใน GetStorage
+- รับ `text` และ `color` — ใช้ใน DetailScreen แสดง center (สีน้ำเงิน) และวันที่ (สีเขียว)
+- สไตล์: พื้นหลังสีอ่อน 10% + เส้นขอบสี 50% + ข้อความ bold
 
 ---
 
-## Flow การทำงานทั้งหมด
+### `view/widgets/keyword_chip.dart`
+**หน้าที่:** Chip แสดง keyword ของภาพ
+
+- Material `Chip` แสดงข้อความในรูปแบบ `#keyword`
+- ใช้ใน DetailScreen ใน `Wrap` เพื่อ wrap หลาย keyword
+
+---
+
+---
+
+## Favorite Workflow — ไหลของระบบ Favorite ทั้งหมด
+
+ระบบ Favorite เริ่มต้นตั้งแต่แอปขึ้น และสิ้นสุดเมื่อข้อมูลถูกบันทึกลง storage ถาวร โดยแบ่งเป็น 3 ช่วงหลัก:
+
+---
+
+### ช่วงที่ 1 — App Startup: โหลด Favorites จาก Storage
 
 ```
-1. main() → GetStorage.init() → runApp(MyApp)
-2. MultiBlocProvider สร้าง NasaBlocBloc + FavoritesBlocBloc
-3. FavoritesBlocBloc → add(LoadFavorites) → โหลด favorites จาก storage
-4. MyHomePage.initState() → add(FetchNasaImages)
-5. NasaBlocBloc → Dio GET NASA API → emit NasaBlocLoaded(items)
-6. GridView แสดงภาพทั้งหมด
-7. ผู้ใช้กดภาพ → Navigator.push → DetailScreen
-8. ผู้ใช้กดปุ่มดาว → add(ToggleFavorite(url)) → FavoritesBlocBloc
-9. FavoritesBlocBloc → เขียน/ลบจาก storage → emit FavoritesBlocLoaded
-10. BlocConsumer → drive animation + rebuild ไอคอนดาว
+main.dart
+  └── await GetStorage.init()              ← ต้อง await ก่อนเสมอ
+  └── MultiBlocProvider
+        └── InjectionContainer.createFavoritesBlocBloc()
+              └── FavoritesBlocBloc(FavoriteViewModel())
+                    └── ..add(LoadFavorites())   ← ยิง event ทันทีตอนสร้าง
+```
+
+**LoadFavorites event flow:**
+```
+FavoritesBlocBloc.on<LoadFavorites>
+  └── FavoriteViewModel.loadFavorites()
+        └── FavoritesStorage.getAllFavorites()
+              └── GetStorage.read('nasa_favorites')  ← อ่านจาก disk
+                    └── List<String> (URLs)
+  └── _favorites = urls.toSet()            ← เก็บใน Set ภายใน ViewModel
+  └── emit FavoritesBlocLoaded(favorites)  ← broadcast ให้ทุก widget
+```
+
+หลังจากนี้ทุก `BlocBuilder` ที่ฟัง `FavoritesBlocBloc` จะได้รับ state พร้อม URL ทั้งหมด
+
+---
+
+### ช่วงที่ 2 — User Interaction: กดปุ่มดาว
+
+ผู้ใช้กด `FavoriteButton` ใน `DetailScreen`:
+
+```
+FavoriteButton.onPressed
+  └── context.read<FavoritesBlocBloc>().add(ToggleFavorite(imageUrl))
+
+FavoritesBlocBloc.on<ToggleFavorite>
+  └── FavoriteViewModel.toggleFavorite(imageUrl)
+        ├── [ถ้า URL อยู่ใน _favorites แล้ว]
+        │     ├── FavoritesStorage.removeFavorite(url)
+        │     │     └── list.removeWhere(...)
+        │     │           └── GetStorage.write('nasa_favorites', list)  ← บันทึก
+        │     └── _favorites.remove(url)
+        └── [ถ้า URL ยังไม่อยู่ใน _favorites]
+              ├── FavoritesStorage.saveFavorite(url)
+              │     └── list.add(url)
+              │           └── GetStorage.write('nasa_favorites', list)  ← บันทึก
+              └── _favorites.add(url)
+  └── emit FavoritesBlocLoaded(_viewModel.favorites)  ← broadcast state ใหม่
 ```
 
 ---
 
-## ไฟล์ที่ยังไม่ได้ implement
+### ช่วงที่ 3 — UI Reaction: อัปเดต Widget พร้อมกัน
 
-| ไฟล์ | สถานะ |
-|---|---|
-| `core/constants/api_constants.dart` | ว่างเปล่า — URL ยังฝังตรงใน data source |
-| `core/errors/exceptions.dart` | ว่างเปล่า |
-| `core/errors/failures.dart` | ว่างเปล่า |
-| `core/network/dio_client.dart` | ว่างเปล่า — Dio สร้างตรงใน injection |
-| `domain/usecases/get_nasa_images.dart` | ว่างเปล่า |
-| `view_model/favorite_view_model.dart` | ว่างเปล่า |
-| `dartz` package | import แต่ไม่ได้ใช้ Either type |
+state ใหม่ถูก broadcast ไปยัง widget ทุกตัวที่ฟัง `FavoritesBlocBloc`:
+
+**FavoriteButton (DetailScreen):**
+```
+BlocConsumer.listener
+  ├── isFavorite → _animationController.forward()  ← scale 1.0 → 1.15 (elasticOut)
+  └── ไม่ใช่  → _animationController.reverse()
+
+BlocConsumer.builder
+  ├── isFavorite → Icons.star (สีทอง)
+  └── ไม่ใช่  → Icons.star_border (สีทองจาง)
+```
+
+**NasaImageCard (HomeScreen Grid):**
+```
+BlocBuilder.buildWhen
+  └── rebuild เฉพาะเมื่อ isFavorite ของ URL นั้น ๆ เปลี่ยน
+BlocBuilder.builder
+  ├── isFavorite → แสดงไอคอนดาวเล็กมุมขวาบน
+  └── ไม่ใช่  → ซ่อน
+```
+
+---
+
+### สรุปภาพรวม Favorite Lifecycle
+
+```
+[App Start]
+    │
+    ▼
+GetStorage.init()  ←── ต้อง await ก่อน runApp()
+    │
+    ▼
+FavoritesBlocBloc created
+    │
+    ▼
+LoadFavorites event ──► FavoriteViewModel.loadFavorites()
+                              │
+                              ▼
+                        FavoritesStorage.getAllFavorites()
+                              │
+                              ▼
+                        _favorites = Set<String>  ←── state ใน memory
+                              │
+                              ▼
+                        emit FavoritesBlocLoaded  ──► widgets rebuild
+
+[User taps star]
+    │
+    ▼
+ToggleFavorite(url) event ──► FavoriteViewModel.toggleFavorite()
+                                    │
+                        ┌───────────┴───────────┐
+                    remove(url)             add(url)
+                        │                       │
+                  Storage.remove()        Storage.save()
+                        │                       │
+                    GetStorage.write()    GetStorage.write()  ←── persist to disk
+                        │                       │
+                        └───────────┬───────────┘
+                                    ▼
+                        emit FavoritesBlocLoaded  ──► animation + icon update
+```
+
+**จุดเริ่มต้น:** `GetStorage.init()` ใน `main.dart` — ถ้าไม่ await ขั้นตอนนี้ ข้อมูล favorites จะอ่านไม่ได้
+**จุดสิ้นสุด (persist):** `GetStorage.write('nasa_favorites', list)` ใน `FavoritesStorage` — ข้อมูลอยู่ถาวรแม้ปิดแอป
+
+---
+
+### File → Function Chain (เส้นทางแบบละเอียด)
+
+#### Path A — โหลด Favorites ตอนแอปเริ่ม
+
+| ลำดับ | File | Function |
+| --- | --- | --- |
+| 1 | `main.dart` | `main()` → `await GetStorage.init()` |
+| 2 | `main.dart` | `MyApp.build()` → `MultiBlocProvider` |
+| 3 | `injection_container.dart` | `createFavoritesBlocBloc()` → สร้าง `FavoriteViewModel()` + `FavoritesBlocBloc()` |
+| 4 | `favorites_bloc_bloc.dart` | `FavoritesBlocBloc()` constructor → `..add(LoadFavorites())` |
+| 5 | `favorites_bloc_bloc.dart` | `on<LoadFavorites>` handler → เรียก `_viewModel.loadFavorites()` |
+| 6 | `favorite_view_model.dart` | `loadFavorites()` → เรียก `FavoritesStorage.getAllFavorites()` |
+| 7 | `favorites_storage.dart` | `getAllFavorites()` → เรียก `_getAllSync()` |
+| 8 | `favorites_storage.dart` | `_getAllSync()` → `GetStorage.read('nasa_favorites')` → คืน `List<String>` |
+| 9 | `favorite_view_model.dart` | `_favorites = urls.toSet()` → เก็บใน memory |
+| 10 | `favorites_bloc_bloc.dart` | `emit(FavoritesBlocLoaded(_viewModel.favorites))` |
+| 11 | `nasa_image_card.dart` | `BlocBuilder.builder` → `state.isFavorite(item.imageUrl)` → แสดง/ซ่อนดาว |
+
+---
+
+#### Path B — กดปุ่มดาว (Toggle Favorite)
+
+| ลำดับ | File | Function |
+| --- | --- | --- |
+| 1 | `favorite_button.dart` | `IconButton.onPressed` → `context.read<FavoritesBlocBloc>().add(ToggleFavorite(imageUrl))` |
+| 2 | `favorites_bloc_event.dart` | สร้าง `ToggleFavorite(imageUrl)` event |
+| 3 | `favorites_bloc_bloc.dart` | `on<ToggleFavorite>` handler → เรียก `_viewModel.toggleFavorite(event.imageUrl)` |
+| 4 | `favorite_view_model.dart` | `toggleFavorite(imageUrl)` → ตรวจ `_favorites.contains(url)` |
+| 5a | `favorites_storage.dart` | (ถ้ามีอยู่แล้ว) `removeFavorite(url)` → `_getAllSync()` + `list.removeWhere()` + `GetStorage.write()` |
+| 5b | `favorites_storage.dart` | (ถ้ายังไม่มี) `saveFavorite(url)` → `_getAllSync()` + `list.add()` + `GetStorage.write()` |
+| 6 | `favorites_bloc_bloc.dart` | `emit(FavoritesBlocLoaded(_viewModel.favorites))` → broadcast state ใหม่ |
+| 7 | `favorite_button.dart` | `BlocConsumer.listener` → `_animationController.forward()` หรือ `.reverse()` |
+| 8 | `favorite_button.dart` | `BlocConsumer.builder` → สลับ `Icons.star` / `Icons.star_border` |
+| 9 | `nasa_image_card.dart` | `BlocBuilder.builder` → `state.isFavorite(item.imageUrl)` → อัปเดตดาวบน Grid card |
+
+---
+
+#### จุดเริ่มต้น → จุดสิ้นสุด
+
+```
+เริ่ม: main.dart → main()
+  ↓
+สิ้นสุด (persist): favorites_storage.dart → _getAllSync() + GetStorage.write()
+```
+
+ทุกครั้งที่กดดาว ข้อมูลไหลจาก `favorite_button.dart:onPressed`
+ผ่าน BLoC → ViewModel → Storage แล้วสะท้อนกลับมาที่ UI สองจุดพร้อมกัน:
+`favorite_button.dart` (animation + icon) และ `nasa_image_card.dart` (ดาวมุมบน grid)
+
+---
+
+## สรุป Dependency ระหว่าง Layer
+
+```
+View
+  └── อ่าน State จาก BLoC
+  └── ยิง Event ไปที่ BLoC
+
+BLoC (bridge)
+  └── delegate logic ไปที่ ViewModel / Repository
+
+ViewModel
+  └── เรียก Storage (FavoritesStorage)
+
+Repository
+  └── เรียก DataSource
+
+DataSource
+  └── เรียก Dio (HTTP)
+
+Storage / Dio
+  └── ติดต่อ External (GetStorage / NASA API)
+```

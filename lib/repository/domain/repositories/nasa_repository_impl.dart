@@ -1,6 +1,6 @@
-import 'package:xeza_gallery/features/nasa_gallery/data/datasources/nasa_remote_data_source.dart';
-import '../../domain/entities/nasa_item.dart';
-import '../../domain/repositories/nasa_repository.dart';
+import 'package:xeza_gallery/repository/data/datasources/nasa_remote_data_source.dart';
+import '../entities/nasa_item.dart';
+import 'nasa_repository.dart';
 
 class NasaRepositoryImpl implements NasaRepository {
   final NasaRemoteDataSource remoteDataSource;
