@@ -14,6 +14,7 @@ class FavoriteButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<FavoritesBlocBloc, FavoritesBlocState>(
       buildWhen: (prev, curr) {
+        //เช็ค prev และ curr ว่ามีความเปลี่ยนแปลงอะไรที่เกี่ยวกับ imageUrl นี้มั้ย
         if (prev is FavoritesBlocLoaded && curr is FavoritesBlocLoaded) {
           return prev.isFavorite(imageUrl) != curr.isFavorite(imageUrl);
         }

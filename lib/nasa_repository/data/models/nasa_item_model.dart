@@ -2,7 +2,7 @@ import '../../domain/entities/nasa_item.dart';
 
 class NasaItemModel extends NasaItem {
   NasaItemModel({
-     required super.title,
+    required super.title,
     required super.center,
     required super.dateCreated,
     required super.description,
