@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import '../../../repository/domain/entities/nasa_item.dart';
-import '../../../repository/domain/repositories/nasa_repository.dart';
+import '../../../nasa_repository/domain/entities/nasa_item.dart';
+import '../../../nasa_repository/domain/repositories/nasa_repository.dart';
 
 part 'nasa_bloc_event.dart';
 part 'nasa_bloc_state.dart';

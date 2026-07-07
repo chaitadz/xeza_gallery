@@ -1,5 +1,5 @@
 import 'package:get_storage/get_storage.dart';
-import 'package:xeza_gallery/features/nasa_gallery/presentation/view/pages/home_screen.dart';
+import 'package:xeza_gallery/presentation/view/pages/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:xeza_gallery/injection_container.dart';

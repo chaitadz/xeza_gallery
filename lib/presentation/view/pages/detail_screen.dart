@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:xeza_gallery/presentation/view/widgets/favorite_button.dart';
-import '../../../repository/domain/entities/nasa_item.dart';
+import '../../../nasa_repository/domain/entities/nasa_item.dart';
 import '../widgets/info_badge.dart';
 import '../widgets/keyword_chip.dart';
 

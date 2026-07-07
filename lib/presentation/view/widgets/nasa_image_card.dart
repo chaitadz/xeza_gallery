@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../repository/domain/entities/nasa_item.dart';
+import '../../../nasa_repository/domain/entities/nasa_item.dart';
 import '../../bloc/favorite/favorites_bloc_bloc.dart';
 
 class NasaImageCard extends StatelessWidget {
