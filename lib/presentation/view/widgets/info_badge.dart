@@ -18,10 +18,10 @@ class InfoBadge extends StatelessWidget {
         vertical: 4,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(.1),
+        color: color.withValues(alpha: .1),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: color.withOpacity(.5),
+          color: color.withValues(alpha: .5),
         ),
       ),
       child: Text(

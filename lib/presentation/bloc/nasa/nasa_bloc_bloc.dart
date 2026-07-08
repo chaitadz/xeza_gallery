@@ -7,15 +7,15 @@ part 'nasa_bloc_event.dart';
 part 'nasa_bloc_state.dart';
 
 class NasaBlocBloc extends Bloc<NasaBlocEvent, NasaBlocState> {
-  final NasaRepository repository;
+  final NasaRepository _repository;
 
-  NasaBlocBloc(this.repository) : super(NasaBlocInitial()) {
+  NasaBlocBloc(this._repository) : super(NasaBlocInitial()) {
     on<FetchNasaImages>((event, emit) async {
       emit(NasaBlocLoading());
       await Future.delayed(const Duration(seconds: 2));
 
       try {
-        final nasaItems = await repository.fetchImages();
+        final nasaItems = await _repository.fetchImages();
         emit(NasaBlocLoaded(nasaItems));
       } catch (e) {
         emit(NasaBlocError('เกิดข้อผิดพลาด: $e'));
