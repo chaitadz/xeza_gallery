@@ -9,7 +9,7 @@ class FavoritesBlocBloc extends Bloc<FavoritesBlocEvent, FavoritesBlocState> {
   final FavoriteViewModel _viewModel;
 
   FavoritesBlocBloc(this._viewModel) : super(FavoritesBlocInitial()) {
-    // load events Favorites memmoris
+    // load events Favorites memory
     on<LoadFavorites>((event, emit) async {
       await _viewModel.loadFavorites();
       emit(FavoritesBlocLoaded(_viewModel.favorites));
