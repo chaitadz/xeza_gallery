@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xeza_gallery/presentation/view/pages/newpage_screen.dart';
 import 'home_screen.dart';
 import 'favorites_screen.dart';
 
@@ -15,7 +16,7 @@ class LandingScreen extends StatelessWidget {
             end: Alignment.bottomCenter,
             colors: [
               Theme.of(context).colorScheme.primary.withAlpha(200),
-              Theme.of(context).colorScheme.surface,
+              Colors.blue.withAlpha(600),
             ],
           ),
         ),
@@ -36,7 +37,7 @@ class LandingScreen extends StatelessWidget {
                   'Xeza Gallery',
                   style: Theme.of(context).textTheme.displayLarge?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: Colors.white,
                       ),
                   textAlign: TextAlign.center,
                 ),
@@ -44,7 +45,7 @@ class LandingScreen extends StatelessWidget {
                 Text(
                   'Explore NASA\'s stunning images',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.outline,
+                        color: Colors.white,
                       ),
                   textAlign: TextAlign.center,
                 ),
@@ -73,6 +74,20 @@ class LandingScreen extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (_) => const FavoritesScreen(),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
+                _NavButton(
+                  icon: Icons.new_releases,
+                  title: 'New Page',
+                  description: 'Check out the latest additions',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const NewPageScreen(),
                       ),
                     );
                   },
@@ -121,7 +136,7 @@ class _NavButton extends StatelessWidget {
               Icon(
                 icon,
                 size: 48,
-                color: Theme.of(context).colorScheme.primary,
+                color: Colors.white,
               ),
               const SizedBox(width: 24),
               Expanded(
@@ -132,14 +147,14 @@ class _NavButton extends StatelessWidget {
                       title,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: Colors.white,
                           ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       description,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.outline,
+                            color: Colors.white.withAlpha(200),
                           ),
                     ),
                   ],
