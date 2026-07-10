@@ -12,7 +12,7 @@ class NasaBlocBloc extends Bloc<NasaBlocEvent, NasaBlocState> {
   NasaBlocBloc(this._repository) : super(NasaBlocInitial()) {
     on<FetchNasaImages>((event, emit) async {
       emit(NasaBlocLoading());
-      await Future.delayed(const Duration(seconds: 2));
+      // await Future.delayed(const Duration(seconds: 2));
 
       try {
         final nasaItems = await _repository.fetchImages();

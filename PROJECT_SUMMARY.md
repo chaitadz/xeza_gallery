@@ -39,7 +39,9 @@ lib/
 │   │       └── nasa_bloc_state.dart
 │   ├── view/
 │   │   ├── pages/
+│   │   │   ├── landing_screen.dart
 │   │   │   ├── home_screen.dart
+│   │   │   ├── favorites_screen.dart
 │   │   │   └── detail_screen.dart
 │   │   └── widgets/
 │   │       ├── favorite_button.dart
@@ -72,6 +74,7 @@ void main() async {
 - `GetStorage.init()` ต้อง await ก่อนเสมอ — ถ้าไม่ทำ storage จะอ่านค่า favorites ไม่ได้
 - `MultiBlocProvider` วางเหนือ `MaterialApp` เพื่อให้ทุก route ที่ push ผ่าน `Navigator` เข้าถึง BLoC ทั้งสองได้
 - สร้าง BLoC ทั้งสองผ่าน `InjectionContainer`
+- เปลี่ยน `home` จาก `MyHomePage` เป็น `LandingScreen` (หน้าแรกใหม่)
 
 ---
 
@@ -347,6 +350,20 @@ Future<void> toggleFavorite(imageUrl)  // เพิ่ม/ลบใน _favorite
 
 ---
 
+### `presentation/view/pages/landing_screen.dart`
+
+**หน้าที่:** หน้าแรกของแอป — เลือกว่าจะไป Explore Gallery หรือ My Favorites
+
+- `StatelessWidget` แสดง gradient background (purple → dark)
+- ไอคอน "search" ขนาด 80 และ title "Xeza Gallery"
+- 2 ปุ่ม (Material buttons) พร้อม icon, title, description และ arrow:
+  - **Explore Gallery** → `Navigator.push` ไป `MyHomePage`
+  - **My Favorites** → `Navigator.push` ไป `FavoritesScreen`
+- ใช้ `_NavButton` widget เพื่อ reuse styling (border, icon, text)
+- ธีม: Dark, Material 3, seed color deepPurple
+
+---
+
 ### `presentation/view/pages/home_screen.dart`
 
 **หน้าที่:** หน้าแรกของแอป — แสดง Grid ภาพ NASA
@@ -359,6 +376,20 @@ Future<void> toggleFavorite(imageUrl)  // เพิ่ม/ลบใน _favorite
   - อื่น ๆ → ข้อความ "ไม่มีข้อมูล"
 - Responsive: `screenWidth > 600` → 3 คอลัมน์, อื่น ๆ → 2 คอลัมน์
 - กด card → `Navigator.push` ไป `DetailScreen`
+
+---
+
+### `presentation/view/pages/favorites_screen.dart`
+
+**หน้าที่:** หน้าแสดงรายการภาพที่บันทึกไว้ (favorites)
+
+- `StatefulWidget` — fetch NASA images ในตัว (เพื่อให้ได้ชื่อ/คำอธิบาย ไม่ใช่แค่ URL)
+- `initState` ยิง `FetchNasaImages` (โหลดจาก API)
+- `BlocBuilder` double — อ่าน `NasaBlocBloc` (NASA images) และ `FavoritesBlocBloc` (favorites URLs)
+- Filter `nasaItems` ที่มี URL อยู่ใน `favoriteUrls` set
+- ถ้าว่าง → แสดง empty state (ไอคอนหัวใจ + ข้อความ)
+- ถ้ามีข้อมูล → แสดง `GridView` (เหมือน `home_screen`)
+- Responsive: `screenWidth > 600` → 3 คอลัมน์, อื่น ๆ → 2 คอลัมน์
 
 ---
 

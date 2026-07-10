@@ -1,5 +1,5 @@
 import 'package:get_storage/get_storage.dart';
-import 'package:xeza_gallery/presentation/view/pages/home_screen.dart';
+import 'package:xeza_gallery/presentation/view/pages/landing_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:xeza_gallery/injection_container.dart';
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         title: 'Nasa BLoC Demo',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.getDarkTheme(),
-        home: const MyHomePage(title: 'Nasa Earth Gallery'),
+        home: const LandingScreen(),
       ),
     );
   }
